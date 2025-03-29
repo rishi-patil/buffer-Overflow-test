@@ -1,15 +1,28 @@
-import xmltodict
+import sys
 import json
+import xml.etree.ElementTree as ET
 
-input_file = "cppcheck-results.xml"
-output_file = "cppcheck-results.json"
+def xml_to_json(xml_file, json_file):
+    tree = ET.parse(xml_file)
+    root = tree.getroot()
 
-with open(input_file, "r") as xml_file:
-    data_dict = xmltodict.parse(xml_file.read())
+    issues = []
+    for error in root.findall("error"):
+        issue = {
+            "file": error.get("file"),
+            "line": error.get("line"),
+            "severity": error.get("severity"),
+            "message": error.get("msg"),
+            "id": error.get("id"),
+        }
+        issues.append(issue)
 
-json_output = json.dumps(data_dict, indent=4)
+    with open(json_file, "w") as f:
+        json.dump({"issues": issues}, f, indent=4)
 
-with open(output_file, "w") as json_file:
-    json_file.write(json_output)
-
-print("Converted cppcheck results to JSON format.")
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python convert_cppcheck.py <input.xml> <output.json>")
+        sys.exit(1)
+    
+    xml_to_json(sys.argv[1], sys.argv[2])
