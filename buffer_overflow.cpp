@@ -2,8 +2,8 @@
 #include <cstring>
 
 void vulnerableFunction(char *input) {
-    char buffer[10];  // Small buffer
-    strcpy(buffer, input);  // No bounds checking
+    char buffer[10]; 
+    strcpy(buffer, input); 
     std::cout << "You entered: " << buffer << std::endl;
 }
 
